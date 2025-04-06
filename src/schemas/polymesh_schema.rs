@@ -112,6 +112,25 @@ impl PolyMeshSchema {
         Ok(chunk_vector_by_3(pod_array)?)
     }
 
+    pub fn load_normals_sample(
+        &self,
+        sample_index: u32,
+        reader: &mut dyn ArchiveReader,
+    ) -> Result<Vec<[f32; 3]>> {
+        if let Some(normals) = &self.normals {
+            let pod_array = normals.load_sample(sample_index, reader)?;
+            let pod_array = if let PodArray::F32(array) = pod_array {
+                array
+            } else {
+                return Err(InternalError::Unreachable.into());
+            };
+
+            Ok(chunk_vector_by_3(pod_array)?)
+        } else {
+            Ok(vec![])
+        }
+    }
+
     pub fn load_facecounts_sample(
         &self,
         sample_index: u32,
